@@ -1,19 +1,39 @@
 package org.training.turkcell.order.rest;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.training.turkcell.order.rest.models.OrderDto;
+import org.training.turkcell.order.rest.models.OrderPlaceResponse;
+import org.training.turkcell.order.services.OrderManagementService;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/order/management")
-public class OrderManagementController {
+@RequiredArgsConstructor
+public class OrderManagementController implements IOrderManagementController {
+    private final OrderManagementService orderManagementService;
 
-    @PostMapping("/place")
-    public void placeOrder(){
+
+    public OrderPlaceResponse placeOrder(@Valid @RequestBody OrderDto orderDtoParam) {
+        String orderId = orderManagementService.placeOrder(null);
+
+        return OrderPlaceResponse.builder()
+                                 .withOrderId("37246udhsf")
+                                 .withEstimation(LocalDateTime.now()
+                                                              .plusHours(1))
+                                 .build();
     }
 
-    @PostMapping("/cancel")
-    public void cancelOrder(){
+    public String cancelOrder(@RequestParam String orderId) {
+        return null;
+    }
+
+
+    public String reactivateOrder(@RequestParam String orderId) {
+        return null;
     }
 
 }
