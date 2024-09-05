@@ -11,4 +11,6 @@ public class PaymentResponse {
     private String customerNumber;
     private String orderId;
     private String desc;
+    private String paymentId;
+
 }
