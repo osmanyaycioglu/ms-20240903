@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.training.turkcell.order.rest.mappers.IOrderMappings;
 import org.training.turkcell.order.rest.models.OrderDto;
 import org.training.turkcell.order.rest.models.OrderPlaceResponse;
 import org.training.turkcell.order.services.OrderManagementService;
@@ -18,22 +19,22 @@ public class OrderManagementController implements IOrderManagementController {
 
 
     public OrderPlaceResponse placeOrder(@Valid @RequestBody OrderDto orderDtoParam) {
-        String orderId = orderManagementService.placeOrder(null);
+        String orderId = orderManagementService.placeOrder(IOrderMappings.ORDER_MAPPINGS.toOrder(orderDtoParam));
 
         return OrderPlaceResponse.builder()
-                                 .withOrderId("37246udhsf")
+                                 .withOrderId(orderId)
                                  .withEstimation(LocalDateTime.now()
                                                               .plusHours(1))
                                  .build();
     }
 
     public String cancelOrder(@RequestParam String orderId) {
-        return null;
+        return orderManagementService.cancelOrder(orderId);
     }
 
 
     public String reactivateOrder(@RequestParam String orderId) {
-        return null;
+        return orderManagementService.reactivateOrder(orderId);
     }
 
 }

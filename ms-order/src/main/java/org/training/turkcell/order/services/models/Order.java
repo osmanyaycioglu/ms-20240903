@@ -13,7 +13,7 @@ public class Order {
     private String        phoneNumber;
     private String        address;
     private String        street;
-    private List<MealDto> meals;
+    private List<Meal> meals;
     private LocalDateTime scheduleTime;
     private EOrderStatus  orderStatus;
     private Long          customerId;
