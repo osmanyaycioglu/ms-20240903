@@ -1,0 +1,65 @@
+management:
+  endpoint:
+    health:
+      show-components: always
+      show-details: always
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+server:
+  error:
+    include-binding-errors: always
+    include-exception: true
+    include-message: always
+  port: ${my.port:10000}
+spring:
+  application:
+    name: order
+  config:
+    import: configserver:http://127.0.0.1:8888
+  cloud:
+    config:
+      retry:
+        initial-interval: 1000
+    loadbalancer:
+      retry:
+        retry-on-all-exceptions: true
+        retry-on-all-operations: true
+        max-retries-on-same-service-instance: 0
+        max-retries-on-next-service-instance: 2
+resilience4j:
+  retry:
+    instances:
+      payment-process-retry:
+        base-config: abc
+      payment-process-retry2:
+        base-config: abc
+    configs:
+      abc:
+        max-attempts: 5
+        wait-duration: 10ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        exponential-max-wait-duration: 30ms
+        # retry-exception-predicate: org.training.turkcell.order.resilience.PaymentProcessRetryExceptionPredicate
+        retry-exceptions:
+          - java.io.IOException
+          - java.lang.IllegalArgumentException
+          - java.lang.IllegalStateException
+  circuitbreaker:
+    instances:
+      payment-process-cb:
+        sliding-window-type: count_based
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 30
+        wait-duration-in-open-state: 5s
+        automatic-transition-from-open-to-half-open-enabled: false
+        permitted-number-of-calls-in-half-open-state: 10
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 500ms
+
+

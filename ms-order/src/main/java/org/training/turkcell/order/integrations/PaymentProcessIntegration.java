@@ -3,8 +3,10 @@ package org.training.turkcell.order.integrations;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
-import com.netflix.discovery.shared.Applications;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.training.turkcell.order.services.models.Order;
@@ -17,14 +19,17 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 @RequiredArgsConstructor
 public class PaymentProcessIntegration {
-    private final RestTemplate restTemplate;
-    private final EurekaClient eurekaClient;
-    private final IPaymentProcessFeignClient  paymentProcessFeignClient;
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentProcessIntegration.class);
+
+    private final RestTemplate               restTemplate;
+    private final EurekaClient               eurekaClient;
+    private final IPaymentProcessFeignClient paymentProcessFeignClient;
 
     private AtomicLong index = new AtomicLong();
 
 
-    public PaymentResponse pay(Order orderParam) {
+    public PaymentResponse pay3(Order orderParam) {
         if (orderParam.getPrice() == null) {
             throw new IllegalArgumentException("Price bilgisi boş olamaz");
         }
@@ -39,7 +44,7 @@ public class PaymentProcessIntegration {
         return paymentProcessFeignClient.pay(paymentRequestLoc);
 
     }
-
+    @Retry(name = "payment-process-retry2")
     public PaymentResponse pay2(Order orderParam) {
         if (orderParam.getPrice() == null) {
             throw new IllegalArgumentException("Price bilgisi boş olamaz");
@@ -58,10 +63,13 @@ public class PaymentProcessIntegration {
 
     }
 
-
-    public PaymentResponse pay3(Order orderParam) {
+    @Retry(name = "payment-process-retry")
+    public PaymentResponse pay(Order orderParam) {
         if (orderParam.getPrice() == null) {
             throw new IllegalArgumentException("Price bilgisi boş olamaz");
+        }
+        if (orderParam.getPrice() != null) {
+            throw new IllegalStateException("Price bilgisi boş olamaz");
         }
 
         PaymentRequest paymentRequestLoc = PaymentRequest.builder()
@@ -75,13 +83,17 @@ public class PaymentProcessIntegration {
         List<InstanceInfo> instancesLoc    = applicationsLoc.getInstances();
         int                currentIndex    = (int) (index.incrementAndGet() % instancesLoc.size());
         InstanceInfo       instanceInfoLoc = instancesLoc.get(currentIndex);
-        return restTemplateLoc.postForObject("http://"
-                                             + instanceInfoLoc.getIPAddr()
-                                             + ":"
-                                             + instanceInfoLoc.getPort()
-                                             + "/api/v1/payment/process/pay",
-                                             paymentRequestLoc,
-                                             PaymentResponse.class);
+
+
+        PaymentResponse paymentResponseLoc = restTemplateLoc.postForObject("http://"
+                                                                           + instanceInfoLoc.getIPAddr()
+                                                                           + ":"
+                                                                           + instanceInfoLoc.getPort()
+                                                                           + "/api/v1/payment/process/pay",
+                                                                           paymentRequestLoc,
+                                                                           PaymentResponse.class);
+
+        return paymentResponseLoc;
 
     }
 
