@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.training.turkcell.order.integrations.PaymentProcessIntegration;
+import org.training.turkcell.order.integrations.notify.NotifyIntegration;
 import org.training.turkcell.order.services.models.Order;
 import org.training.turkcell.payment.rest.models.PaymentResponse;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderManagementService {
     private final PaymentProcessIntegration paymentProcessIntegration;
+    private final NotifyIntegration         notifyIntegration;
 
     public String placeOrder(Order orderParam) {
         orderParam.setPrice(new BigDecimal(1000));
@@ -22,12 +24,16 @@ public class OrderManagementService {
         PaymentResponse payLoc = paymentProcessIntegration.pay(orderParam);
         orderParam.setPaymentId(payLoc.getPaymentId());
         // Data layer git ve yaz
-        return "Siparişiniz alındı sipariş no su : "
-               + orderParam.getOrderId()
-               + " ödeme id : "
-               + payLoc.getPaymentId()
-               + " server : "
-               + payLoc.getDesc();
+        String msg = "Siparişiniz alındı sipariş no su : "
+                     + orderParam.getOrderId()
+                     + " ödeme id : "
+                     + payLoc.getPaymentId()
+                     + " server : "
+                     + payLoc.getDesc();
+        notifyIntegration.method(orderParam.getPhoneNumber(),
+                                 msg);
+        return msg;
+
     }
 
     public String cancelOrder(@RequestParam String orderId) {
