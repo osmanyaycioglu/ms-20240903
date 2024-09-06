@@ -1,0 +1,14 @@
+server:
+  port: ${my.port:8080}
+spring:
+  application:
+    name: apigw-order
+  config:
+    import: configserver:http://127.0.0.1:8888
+  cloud:
+    gateway:
+      routes:
+        - id: order-ms-route
+          uri: lb://ORDER
+          predicates:
+          - Path=/api/v1/order/**

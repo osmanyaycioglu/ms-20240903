@@ -44,11 +44,12 @@ resilience4j:
         enable-exponential-backoff: true
         exponential-backoff-multiplier: 2
         exponential-max-wait-duration: 30ms
-        # retry-exception-predicate: org.training.turkcell.order.resilience.PaymentProcessRetryExceptionPredicate
-        retry-exceptions:
-          - java.io.IOException
-          - java.lang.IllegalArgumentException
-          - java.lang.IllegalStateException
+        retry-exception-predicate: org.training.turkcell.order.resilience.PaymentProcessRetryExceptionPredicate
+        result-predicate: org.training.turkcell.order.resilience.PaymentProcessResultRetryPredicate
+        #retry-exceptions:
+        #  - java.io.IOException
+        #  - java.lang.IllegalArgumentException
+        #  - java.lang.IllegalStateException
   circuitbreaker:
     instances:
       payment-process-cb:

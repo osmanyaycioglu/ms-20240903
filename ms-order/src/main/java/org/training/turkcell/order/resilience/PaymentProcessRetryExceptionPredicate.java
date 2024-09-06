@@ -1,5 +1,6 @@
 package org.training.turkcell.order.resilience;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.springframework.web.client.RestClientResponseException;
 import org.training.turkcell.order.error.ErrorObj;
 
@@ -24,6 +25,8 @@ public class PaymentProcessRetryExceptionPredicate implements Predicate<Throwabl
             }
         } else if (throwableParam instanceof IOException) {
             return true;
+        } else if (throwableParam instanceof CallNotPermittedException) {
+            return false;
         }
         return false;
     }

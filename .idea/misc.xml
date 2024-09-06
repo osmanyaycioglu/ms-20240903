@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="FrameworkDetectionExcludesConfiguration">
-  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
@@ -12,6 +10,7 @@
         <option value="$PROJECT_DIR$/ms-order/pom.xml" />
         <option value="$PROJECT_DIR$/ms-payment/pom.xml" />
         <option value="$PROJECT_DIR$/ms-pay-api/pom.xml" />
+        <option value="$PROJECT_DIR$/apigw-order/pom.xml" />
       </list>
     </option>
   </component>

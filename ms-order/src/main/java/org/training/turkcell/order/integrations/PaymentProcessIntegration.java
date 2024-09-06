@@ -3,6 +3,7 @@ package org.training.turkcell.order.integrations;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -44,6 +45,8 @@ public class PaymentProcessIntegration {
         return paymentProcessFeignClient.pay(paymentRequestLoc);
 
     }
+
+
     @Retry(name = "payment-process-retry2")
     public PaymentResponse pay2(Order orderParam) {
         if (orderParam.getPrice() == null) {
@@ -63,13 +66,11 @@ public class PaymentProcessIntegration {
 
     }
 
+    // @CircuitBreaker(name = "payment-process-cb")
     @Retry(name = "payment-process-retry")
     public PaymentResponse pay(Order orderParam) {
         if (orderParam.getPrice() == null) {
             throw new IllegalArgumentException("Price bilgisi boş olamaz");
-        }
-        if (orderParam.getPrice() != null) {
-            throw new IllegalStateException("Price bilgisi boş olamaz");
         }
 
         PaymentRequest paymentRequestLoc = PaymentRequest.builder()

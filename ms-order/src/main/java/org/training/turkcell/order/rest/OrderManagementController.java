@@ -3,6 +3,7 @@ package org.training.turkcell.order.rest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.training.turkcell.order.rest.mappers.IOrderMappings;
 import org.training.turkcell.order.rest.models.OrderDto;
@@ -17,6 +18,9 @@ import java.util.List;
 public class OrderManagementController implements IOrderManagementController {
     private final OrderManagementService orderManagementService;
 
+    @Value("${server.port}")
+    private Integer port;
+
 
     public OrderPlaceResponse placeOrder(@Valid @RequestBody OrderDto orderDtoParam) {
         String orderId = orderManagementService.placeOrder(IOrderMappings.ORDER_MAPPINGS.toOrder(orderDtoParam));
@@ -25,6 +29,7 @@ public class OrderManagementController implements IOrderManagementController {
                                  .withOrderId(orderId)
                                  .withEstimation(LocalDateTime.now()
                                                               .plusHours(1))
+                                 .withDesc("Order Port : " + port)
                                  .build();
     }
 

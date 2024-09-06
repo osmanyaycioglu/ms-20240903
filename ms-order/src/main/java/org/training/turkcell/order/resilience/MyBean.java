@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class MyBean {
     private long count = 0;
 
-    @CircuitBreaker(name = "payment-process-cb")
-    @Retry(name = "payment-process-retry")
+    @CircuitBreaker(name = "payment-process-cb", fallbackMethod = "callMeFallback")
+    // @Retry(name = "payment-process-retry")
     public String callMe(String str) {
         System.out.println("Count : " + count + " str : " + str);
         count++;
@@ -23,8 +23,14 @@ public class MyBean {
         return "Call : " + count + " success";
     }
 
+    public String callMeFallback(String str,
+                                 Throwable throwableParam) {
+        System.out.println("-*-*-*-*-*-* Fallback : " + throwableParam);
+        return "Fallback sonucu";
+    }
+
     @MyInterceptAnno
-    public String test(String str){
+    public String test(String str) {
         return "Hello world : " + str;
     }
 
