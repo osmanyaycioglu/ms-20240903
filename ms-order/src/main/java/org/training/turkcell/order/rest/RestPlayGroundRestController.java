@@ -1,6 +1,8 @@
 package org.training.turkcell.order.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,12 +10,16 @@ import org.training.turkcell.order.rest.models.Person;
 
 @RestController
 @RequestMapping("/hello")
+@RefreshScope
 public class RestPlayGroundRestController {
+
+    @Value("${a.b.c}")
+    private String abc;
 
     // @RequestMapping(value = "/hello/hello1",method = RequestMethod.GET)
     @GetMapping("/hello1")
     public String hello1() {
-        return "Hello world - GET";
+        return "Hello world - GET " + abc;
     }
 
     @PostMapping("/hello1")
